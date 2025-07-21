@@ -24,7 +24,7 @@ class GitLabLangChainTools:
         
         try:
             self.gitlab_wrapper = GitLabAPIWrapper(
-                gitlab_base_url=os.getenv('GITLAB_URL', 'https://gitlab.com'),
+                gitlab_url=os.getenv('GITLAB_URL', 'https://gitlab.com'),
                 gitlab_personal_access_token=os.getenv('GITLAB_PRIVATE_TOKEN'),
                 gitlab_repository=os.getenv('PROJECT_ID')  # Can be project ID or path
             )

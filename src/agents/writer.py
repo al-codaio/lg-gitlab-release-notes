@@ -46,21 +46,21 @@ class WriterAgent:
         
         # Features section
         if categorized['features']:
-            sections['features'] = [f"- {mr['title']} (#{mr['id']})" 
+            sections['features'] = [f"- {mr['title']} (#{mr['iid']})" 
                                    for mr in categorized['features']]
             markdown_parts.append("\n## <� New Features")
             markdown_parts.extend(sections['features'])
         
         # Bug fixes
         if categorized['fixes']:
-            sections['fixes'] = [f"- {mr['title']} (#{mr['id']})" 
+            sections['fixes'] = [f"- {mr['title']} (#{mr['iid']})" 
                                for mr in categorized['fixes']]
             markdown_parts.append("\n## = Bug Fixes")
             markdown_parts.extend(sections['fixes'])
         
         # Breaking changes
         if categorized['breaking']:
-            sections['breaking'] = [f"- {mr['title']} (#{mr['id']})" 
+            sections['breaking'] = [f"- {mr['title']} (#{mr['iid']})" 
                                   for mr in categorized['breaking']]
             markdown_parts.append("\n## � Breaking Changes")
             markdown_parts.extend(sections['breaking'])

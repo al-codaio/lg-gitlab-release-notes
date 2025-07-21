@@ -4,7 +4,7 @@ Main application with LangChain GitLab integration
 
 import asyncio
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from src.graph.async_workflow import create_release_notes_graph
@@ -36,8 +36,8 @@ async def main():
         # Generate release notes for last 30 days
         initial_state = ReleaseNotesState(
             project_id=os.getenv('PROJECT_ID'),
-            from_date=datetime.now() - timedelta(days=60),  # Last 60 days
-            to_date=datetime.now(),
+            from_date=datetime.now(timezone.utc) - timedelta(days=60),  # Last 60 days
+            to_date=datetime.now(timezone.utc),
             merge_requests=[],
             issues=[],
             commits=[],
