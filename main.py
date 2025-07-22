@@ -1,7 +1,3 @@
-"""
-Main application with LangChain GitLab integration
-"""
-
 import asyncio
 import os
 from datetime import datetime, timedelta, timezone
@@ -10,33 +6,29 @@ from langchain_openai import ChatOpenAI
 from src.graph.async_workflow import create_release_notes_graph
 from src.graph.state import ReleaseNotesState
 
+# Load environment variables
+load_dotenv()
 
-async def main():
-    """Run the GitLab release notes generator with LangChain GitLab toolkit"""
+# Initialize LLM
+llm = ChatOpenAI(
+    api_key=os.getenv('OPENAI_API_KEY'),
+    model="gpt-3.5-turbo",
+    temperature=0.3
+)
+
+# Create the app (graph) - this is used by both CLI and LangGraph Studio
+app = asyncio.run(create_release_notes_graph(llm))
+
+
+async def run_release_notes_generation():
+    """Generate release notes for the last 14 days"""
     print("Starting GitLab Release Notes Generator...")
     
-    # Load environment variables
-    load_dotenv()
-    print("Environment variables loaded")
-    
-    # Initialize LLM
-    print("Initializing OpenAI LLM...")
-    llm = ChatOpenAI(
-        api_key=os.getenv('OPENAI_API_KEY'),
-        model="gpt-3.5-turbo",
-        temperature=0.3
-    )
-    print("LLM initialized")
-    
     try:
-        # Create workflow with LangChain GitLab integration
-        print("Creating release notes workflow...")
-        app = await create_release_notes_graph(llm)
-        
-        # Generate release notes for last 30 days
+        # Create initial state
         initial_state = ReleaseNotesState(
             project_id=os.getenv('PROJECT_ID'),
-            from_date=datetime.now(timezone.utc) - timedelta(days=60),  # Last 60 days
+            from_date=datetime.now(timezone.utc) - timedelta(days=14),
             to_date=datetime.now(timezone.utc),
             merge_requests=[],
             issues=[],
@@ -66,8 +58,7 @@ async def main():
         print(f"\n❌ Fatal error: {e}")
         import traceback
         traceback.print_exc()
-        
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(run_release_notes_generation())

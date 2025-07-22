@@ -1,7 +1,3 @@
-"""
-Async LangGraph workflow with LangChain GitLab integration
-"""
-
 from langgraph.graph import StateGraph, END, START
 from langchain_openai import ChatOpenAI
 from typing import Dict, Any
@@ -77,9 +73,7 @@ async def create_release_notes_graph(llm: ChatOpenAI):
         }
     )
     
-    workflow.add_edge("review", END)
-    
-    # Set entry point
     workflow.add_edge(START, "collect")
+    workflow.add_edge("review", END)
     
     return workflow.compile()

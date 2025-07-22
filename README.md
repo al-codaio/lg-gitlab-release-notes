@@ -1,6 +1,6 @@
 # GitLab Release Notes Generator
 
-A LangGraph-powered application that automatically generates comprehensive release notes by analyzing GitLab activity between releases using the LangChain GitLab toolkit.
+A LangGraph-powered application that automatically generates comprehensive release notes by analyzing GitLab activity.
 
 ## Features
 
@@ -10,22 +10,9 @@ A LangGraph-powered application that automatically generates comprehensive relea
 - **Human-in-the-Loop**: Optional review step for generated release notes
 - **Flexible Date Ranges**: Support for both tag-based and date-based analysis
 - **Customizable Output**: Markdown-formatted release notes with emoji sections
-
-## Architecture
-
-The application uses a two-agent system with LangChain GitLab integration:
-
-1. **Collector Agent**: Gathers data from GitLab via LangChain GitLab toolkit
-2. **Writer Agent**: Analyzes and generates formatted release notes
+- **Two agents**: A Collector agent gathers data and the Writer agent generates the release notes
 
 ## Setup
-
-### Prerequisites
-
-- Python 3.10+
-- [uv](https://github.com/astral-sh/uv) - Fast Python package installer
-- GitLab account with API access
-- OpenAI API key
 
 ### Installation
 
@@ -34,31 +21,17 @@ The application uses a two-agent system with LangChain GitLab integration:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-2. Clone the repository:
-```bash
-git clone <repository-url>
-cd gitlab-release-notes
-```
-
-3. Create virtual environment and install dependencies:
+2. Create virtual environment and install dependencies:
 ```bash
 uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 uv pip install -e .
 ```
 
-4. Configure environment variables:
+3. Configure environment variables:
 ```bash
 cp .env.example .env
-# Edit .env with your credentials
 ```
-
-### Environment Variables
-
-- `GITLAB_URL`: Your GitLab instance URL (default: https://gitlab.com)
-- `GITLAB_PRIVATE_TOKEN`: Your GitLab personal access token
-- `PROJECT_ID`: The GitLab project ID to analyze
-- `OPENAI_API_KEY`: Your OpenAI API key
 
 ## Usage
 
@@ -92,33 +65,6 @@ gitlab-release-notes/
 ├── .env.example         # Environment variables template
 ├── .gitignore           # Git ignore file
 └── README.md            # This file
-```
-
-## Development
-
-Install development dependencies:
-```bash
-uv pip install -e ".[dev]"
-```
-
-Run tests:
-```bash
-pytest
-```
-
-Format code:
-```bash
-black src/
-```
-
-Lint code:
-```bash
-ruff check src/
-```
-
-Type checking:
-```bash
-mypy src/
 ```
 
 ## Customization
@@ -170,7 +116,3 @@ Remove the review node from the workflow in `src/graph/async_workflow.py`.
 ## 👥 Contributors
 Thanks to: @alice, @bob, @charlie
 ```
-
-## License
-
-MIT License

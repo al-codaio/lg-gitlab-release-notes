@@ -1,0 +1,7 @@
+{
+  "graphs": {
+    "release_notes": "./main.py:app"
+  },
+  "dependencies": ["./"],
+  "env": "./src/.env"
+}
