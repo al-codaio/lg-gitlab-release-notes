@@ -16,16 +16,16 @@ llm = ChatOpenAI(
     temperature=0.3
 )
 
-# Create the app (graph) - this is used by both CLI and LangGraph Studio
-app = asyncio.run(create_release_notes_graph(llm))
-
+# Create the app for LangGraph Studio with interrupt (no checkpointer)
+app = asyncio.run(create_release_notes_graph(llm, use_interrupt=True))
 
 async def run_release_notes_generation():
-    """Generate release notes for the last 14 days"""
     print("Starting GitLab Release Notes Generator...")
     
+    # Create CLI version without interrupt
+    cli_app = await create_release_notes_graph(llm, use_interrupt=False)
+    
     try:
-        # Create initial state
         initial_state = ReleaseNotesState(
             project_id=os.getenv('PROJECT_ID'),
             from_date=datetime.now(timezone.utc) - timedelta(days=14),
@@ -42,17 +42,17 @@ async def run_release_notes_generation():
             error=None
         )
         
-        # Run the workflow
         print("🚀 Starting release notes generation...")
-        final_state = await app.ainvoke(initial_state)
+        final_state = await cli_app.ainvoke(initial_state)
         
-        # Save release notes
-        if not final_state.get('error'):
-            with open('RELEASE_NOTES.md', 'w') as f:
-                f.write(final_state['release_notes_markdown'])
-            print(f"\n✅ Release notes saved to RELEASE_NOTES.md")
-        else:
+        if final_state.get('error'):
             print(f"\n❌ Error: {final_state['error']}")
+        elif final_state.get('rejected'):
+            print("\n❌ Release notes were rejected")
+        elif final_state.get('saved'):
+            print("\n✅ Workflow completed successfully")
+        else:
+            print("\n⚠️ Workflow completed but release notes were not saved")
             
     except Exception as e:
         print(f"\n❌ Fatal error: {e}")

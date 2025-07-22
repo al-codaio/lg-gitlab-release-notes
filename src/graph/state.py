@@ -1,8 +1,8 @@
 from typing import TypedDict, List, Dict, Set, Optional
 from datetime import datetime
 
-class ReleaseNotesState(TypedDict):
-    # Configuration
+class ReleaseNotesState(TypedDict, total=False):
+    # Configuration - required fields
     project_id: str
     from_tag: Optional[str]
     to_tag: Optional[str]
@@ -26,3 +26,5 @@ class ReleaseNotesState(TypedDict):
     # Control flow
     needs_human_review: bool
     error: Optional[str]
+    saved: bool
+    rejected: bool

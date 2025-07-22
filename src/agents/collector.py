@@ -1,4 +1,5 @@
 from typing import Dict, Any
+from datetime import datetime
 from ..tools.gitlab_langchain_tools import GitLabLangChainTools
 
 class CollectorAgent:
@@ -8,28 +9,27 @@ class CollectorAgent:
     async def run_async(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """Collect all relevant data from GitLab using LangChain GitLab toolkit"""
         try:
-            project_id = state['project_id']
+            project_id = state.get('project_id')
+            if not project_id:
+                raise ValueError("project_id is required in state")
             
-            # Determine date range
-            if state.get('from_tag') and state.get('to_tag'):
-                # Get commits between tags
-                commits = await self.tools.get_commits(
-                    project_id,
-                    state['from_tag'], 
-                    state['to_tag']
-                )
-                # Extract date range from commits if needed
-                from_date = state.get('from_date', commits[-1]['committed_date'] if commits else None)
-                to_date = state.get('to_date', commits[0]['committed_date'] if commits else None)
-            else:
-                # Use provided dates
-                from_date = state['from_date']
-                to_date = state['to_date']
-                commits = []
+            # For now, only support date-based collection (tags can be added later)
+            from_date = state.get('from_date')
+            to_date = state.get('to_date')
+            
+            if not from_date or not to_date:
+                raise ValueError("from_date and to_date are required")
+            
+            # Convert string dates to datetime if needed
+            if isinstance(from_date, str):
+                from_date = datetime.fromisoformat(from_date.replace('Z', '+00:00'))
+            if isinstance(to_date, str):
+                to_date = datetime.fromisoformat(to_date.replace('Z', '+00:00'))
             
             # Collect data using LangChain GitLab tools
             merge_requests = await self.tools.get_merge_requests(project_id, from_date, to_date)
             issues = await self.tools.get_issues(project_id, from_date, to_date)
+            commits = await self.tools.get_commits(project_id, from_date, to_date)
             
             # Extract contributors
             contributors = set()

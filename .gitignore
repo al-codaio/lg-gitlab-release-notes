@@ -19,21 +19,26 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # Virtual environments
 venv/
 ENV/
 env/
-.venv
-
-# uv
 .venv/
+.virtualenv/
+
+# Package managers
+# uv
 uv.lock
+# pip
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Environment variables
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 
 # IDE
 .vscode/
@@ -41,11 +46,45 @@ uv.lock
 *.swp
 *.swo
 *~
+.project
+.pydevproject
 
 # OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+
+# Testing
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+.hypothesis/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
 
 # Project specific
 RELEASE_NOTES.md
 *.log
+output/
+temp/
+tmp/
+
+# LangGraph
+.langgraph_api/
+
+# Claude AI
+.claude/

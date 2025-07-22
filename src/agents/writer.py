@@ -29,7 +29,7 @@ class WriterAgent:
         }
         
         # Process merge requests
-        for mr in state['merge_requests']:
+        for mr in state.get('merge_requests', []):
             chain = self.categorization_prompt | self.llm
             result = chain.invoke({'change': f"{mr['title']} - {mr['description']}"})
             category = self._extract_category(result.content)
@@ -66,9 +66,9 @@ class WriterAgent:
             markdown_parts.extend(sections['breaking'])
         
         # Contributors
-        if state['contributors']:
+        if state.get('contributors'):
             markdown_parts.append(f"\n## 👥 Contributors")
-            markdown_parts.append(f"Thanks to: {', '.join(sorted(state['contributors']))}")
+            markdown_parts.append(f"Thanks to: {', '.join(sorted(state.get('contributors', [])))}")
         
         return {
             'categorized_changes': categorized,

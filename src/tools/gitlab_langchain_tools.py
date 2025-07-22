@@ -7,6 +7,7 @@ exposed through the LangChain tools.
 """
 
 import os
+import asyncio
 from typing import List, Dict, Set, Optional
 from datetime import datetime
 from langchain_community.agent_toolkits.gitlab.toolkit import GitLabToolkit
@@ -62,8 +63,9 @@ class GitLabLangChainTools:
     async def get_merge_requests(self, project_id: str, since: datetime, until: datetime) -> List[Dict]:
         """Get merged MRs using python-gitlab API directly"""
         try:
-            # Use python-gitlab API directly
-            merge_requests = self.project.mergerequests.list(
+            # Use python-gitlab API directly - wrap in thread to avoid blocking
+            merge_requests = await asyncio.to_thread(
+                self.project.mergerequests.list,
                 state='merged',
                 updated_after=since.isoformat(),
                 updated_before=until.isoformat(),
@@ -75,8 +77,11 @@ class GitLabLangChainTools:
             mrs_data = []
             for mr in merge_requests:
                 try:
-                    # Get full MR data
-                    mr_full = self.project.mergerequests.get(mr.iid)
+                    # Get full MR data - wrap in thread to avoid blocking
+                    mr_full = await asyncio.to_thread(
+                        self.project.mergerequests.get,
+                        mr.iid
+                    )
                     
                     # Check if actually merged in our date range
                     if mr_full.merged_at:
@@ -109,8 +114,9 @@ class GitLabLangChainTools:
     async def get_issues(self, project_id: str, since: datetime, until: datetime) -> List[Dict]:
         """Get closed issues using python-gitlab API directly"""
         try:
-            # Get closed issues
-            issues = self.project.issues.list(
+            # Get closed issues - wrap in thread to avoid blocking
+            issues = await asyncio.to_thread(
+                self.project.issues.list,
                 state='closed',
                 updated_after=since.isoformat(),
                 updated_before=until.isoformat(),
@@ -122,8 +128,11 @@ class GitLabLangChainTools:
             issues_data = []
             for issue in issues:
                 try:
-                    # Get full issue data
-                    issue_full = self.project.issues.get(issue.iid)
+                    # Get full issue data - wrap in thread to avoid blocking
+                    issue_full = await asyncio.to_thread(
+                        self.project.issues.get,
+                        issue.iid
+                    )
                     
                     # Check if closed in our date range
                     if issue_full.closed_at:
@@ -159,8 +168,9 @@ class GitLabLangChainTools:
             if not ref_name:
                 ref_name = self.project.default_branch
             
-            # Get commits
-            commits = self.project.commits.list(
+            # Get commits - wrap in thread to avoid blocking
+            commits = await asyncio.to_thread(
+                self.project.commits.list,
                 ref_name=ref_name,
                 since=since.isoformat(),
                 until=until.isoformat(),
@@ -224,7 +234,8 @@ class GitLabLangChainTools:
     async def get_milestones(self, since: datetime, until: datetime) -> List[Dict]:
         """Get milestones in date range"""
         try:
-            milestones = self.project.milestones.list(
+            milestones = await asyncio.to_thread(
+                self.project.milestones.list,
                 state='all',
                 updated_after=since.isoformat(),
                 updated_before=until.isoformat(),
